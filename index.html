@@ -287,6 +287,7 @@
 
       const totalArrecadado = moradores.reduce((acc, m) => acc + m.colaboracao, 0);
 
+      // Calcular pontuação ponderada (70% pela contribuição financeira + 30% pelos pontos de tarefas)
       let maiorDestaque = null;
       let maiorScore = -1;
 
@@ -365,7 +366,7 @@
                     <input type="number" value="${m.colaboracao}" onchange="atualizarMorador(${m.id}, 'colaboracao', parseFloat(this.value) || 0)" class="bg-transparent text-emerald-400 font-extrabold w-28 text-right outline-none border-b border-transparent focus:border-emerald-500"/>
                   </div>
                 </div>
-                <button onclick="removerMorador(${m.id})" class="text-slate-500 hover:text-rose-400 p-2 text-xs transition-all" title="Excluir Morador">
+                <button onclick="removerMorador(${m.id})" class="text-slate-500 hover:text-rose-400 p-2 text-xs transition-all">
                   <i class="fa-solid fa-trash-can"></i>
                 </button>
               </div>
@@ -420,8 +421,8 @@
             <div class="flex items-center gap-2">
               <span class="text-xs text-slate-400">R$</span>
               <input type="number" value="${c.valor}" onchange="atualizarConta(${c.id}, 'valor', parseFloat(this.value) || 0)" class="bg-transparent text-rose-400 font-bold text-xs w-20 text-right outline-none border-b border-transparent focus:border-rose-500"/>
-              <button onclick="removerConta(${c.id})" class="text-slate-500 hover:text-rose-400 p-1 text-xs" title="Excluir Conta">
-                <i class="fa-solid fa-trash-can"></i>
+              <button onclick="removerConta(${c.id})" class="text-slate-500 hover:text-rose-400 p-1 text-xs">
+                <i class="fa-solid fa-xmark"></i>
               </button>
             </div>
           </div>
@@ -507,20 +508,15 @@
         `;
       });
 
-      // Renderizar Cards de Tarefas (Com botão de excluir adicionado)
+      // Renderizar Cards de Tarefas
       tarefas.forEach(t => {
         container.innerHTML += `
           <div class="p-4 rounded-xl border ${t.concluida ? 'bg-slate-900/40 border-slate-800/60 opacity-60' : 'bg-slate-900/90 border-slate-800'} space-y-3">
             <div class="flex justify-between items-start">
               <h3 class="text-xs font-bold text-white ${t.concluida ? 'line-through text-slate-400' : ''}">${t.nome}</h3>
-              <div class="flex items-center gap-2">
-                <span class="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-md border border-indigo-500/20">
-                  +${t.pontos} pts
-                </span>
-                <button onclick="removerTarefa(${t.id})" class="text-slate-500 hover:text-rose-400 transition-all text-xs" title="Excluir Tarefa">
-                  <i class="fa-solid fa-trash-can"></i>
-                </button>
-              </div>
+              <span class="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-md border border-indigo-500/20">
+                +${t.pontos} pts
+              </span>
             </div>
             <div class="flex justify-between items-center text-xs text-slate-400 pt-2 border-t border-slate-800/80">
               <span>Resp: <strong class="text-slate-200">${t.responsavel}</strong></span>
@@ -557,12 +553,7 @@
       calcularTudo();
     }
 
-    function removerTarefa(id) {
-      tarefas = tarefas.filter(t => t.id !== id);
-      calcularTudo();
-    }
-
-    // Renderizar Multas / Ocorrências (Com botão de excluir adicionado)
+    // Renderizar Multas / Ocorrências
     function renderMultas() {
       const container = document.getElementById('historico-multas');
       container.innerHTML = '';
@@ -582,14 +573,9 @@
               </div>
               <p class="text-xs text-slate-400 mt-0.5">${m.motivo}</p>
             </div>
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-extrabold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">
-                + R$ ${m.valor.toFixed(2)}
-              </span>
-              <button onclick="removerMulta(${m.id})" class="text-slate-500 hover:text-rose-400 p-1 text-xs transition-all" title="Excluir Infração">
-                <i class="fa-solid fa-trash-can"></i>
-              </button>
-            </div>
+            <span class="text-xs font-extrabold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">
+              + R$ ${m.valor.toFixed(2)}
+            </span>
           </div>
         `;
       });
@@ -611,11 +597,6 @@
         data: new Date().toISOString().split('T')[0]
       });
 
-      calcularTudo();
-    }
-
-    function removerMulta(id) {
-      multas = multas.filter(m => m.id !== id);
       calcularTudo();
     }
 

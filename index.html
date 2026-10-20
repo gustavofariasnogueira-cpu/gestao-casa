@@ -112,7 +112,7 @@
               </h2>
               <p class="text-xs text-slate-400">Insira quanto cada morador efetivamente depositou ou pagou este mês</p>
             </div>
-            <button onclick="adicionarMorador()" class="text-xs bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/30 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+            <button onclick="window.adicionarMorador()" class="text-xs bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/30 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
               <i class="fa-solid fa-user-plus"></i> + Add Morador
             </button>
           </div>
@@ -131,7 +131,7 @@
               </h2>
               <p class="text-xs text-slate-400">Contas fixas e compras da casa</p>
             </div>
-            <button onclick="adicionarConta()" class="text-xs bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 border border-rose-500/30 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">
+            <button onclick="window.adicionarConta()" class="text-xs bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 border border-rose-500/30 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">
               <i class="fa-solid fa-plus"></i> Conta
             </button>
           </div>
@@ -169,7 +169,7 @@
               </h2>
               <p class="text-xs text-slate-400">Marque as tarefas conforme forem concluídas para somar pontos</p>
             </div>
-            <button onclick="adicionarTarefa()" class="text-xs bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/30 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">
+            <button onclick="window.adicionarTarefa()" class="text-xs bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/30 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">
               <i class="fa-solid fa-plus"></i> Nova Tarefa
             </button>
           </div>
@@ -182,7 +182,7 @@
       </div>
     </section>
 
-    <!-- TAB 3: REGIMETO INTERNO & INFRAÇÕES -->
+    <!-- TAB 3: REGIMENTO INTERNO & INFRAÇÕES -->
     <section id="sec-regras" class="hidden space-y-8">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
@@ -195,7 +195,7 @@
               </h2>
               <p class="text-xs text-slate-400">Valores cobrados por descumprimento de regras</p>
             </div>
-            <button onclick="aplicarMultaModal()" class="text-xs bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/30 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">
+            <button onclick="window.aplicarMultaModal()" class="text-xs bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/30 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">
               <i class="fa-solid fa-plus"></i> Infração
             </button>
           </div>
@@ -235,38 +235,73 @@
 
   </main>
 
-  <!-- Script da Aplicação -->
-  <script>
+  <!-- FIREBASE SDK & SCRIPT INTEGRADO -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Suas chaves reais do projeto casa-60c5b
+    const firebaseConfig = {
+      apiKey: "AIzaSyDRKxEnWBLCoUL1ZjZd-qM0t5Q_0FJS-Wc",
+      authDomain: "casa-60c5b.firebaseapp.com",
+      projectId: "casa-60c5b",
+      storageBucket: "casa-60c5b.firebasestorage.app",
+      messagingSenderId: "853193816214",
+      appId: "1:853193816214:web:b7eb40211bb5632cb1eab7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const docRef = doc(db, "casa_dados", "geral");
+
     // Estado Global da Aplicação
-    let moradores = [
-      { id: 1, nome: "Gustavo", colaboracao: 2200, pontos: 35 },
-      { id: 2, nome: "Maxine", colaboracao: 1500, pontos: 20 },
-      { id: 3, nome: "Socorro", colaboracao: 800, pontos: 10 },
-      { id: 4, nome: "Marcos", colaboracao: 2200, pontos: 35 },
-      { id: 5, nome: "Junior", colaboracao: 1500, pontos: 20 },
-      { id: 6, nome: "Glauber", colaboracao: 800, pontos: 10 }
-    ];
+    window.state = {
+      moradores: [
+        { id: 1, nome: "Gustavo", colaboracao: 2200, pontos: 35 },
+        { id: 2, nome: "Maxine", colaboracao: 1500, pontos: 20 },
+        { id: 3, nome: "Socorro", colaboracao: 800, pontos: 10 },
+        { id: 4, nome: "Marcos", colaboracao: 2200, pontos: 35 },
+        { id: 5, nome: "Junior", colaboracao: 1500, pontos: 20 },
+        { id: 6, nome: "Glauber", colaboracao: 800, pontos: 10 }
+      ],
+      contas: [
+        { id: 1, nome: "Aluguel / Condomínio", valor: 2100, categoria: "Moradia" },
+        { id: 2, nome: "Luz, Água & Gás", valor: 420, categoria: "Essencial" },
+        { id: 3, nome: "Internet & TV", valor: 160, categoria: "Serviços" },
+        { id: 4, nome: "Supermercado & Feira", valor: 1400, categoria: "Alimentação" }
+      ],
+      tarefas: [
+        { id: 1, nome: "Lavar a louça e organizar pia", responsavel: "Gustavo", pontos: 10, concluida: true },
+        { id: 2, nome: "Limpeza pesada dos banheiros", responsavel: "Maxine", pontos: 20, concluida: true },
+        { id: 3, nome: "Retirar lixo e organizar reciclagem", responsavel: "Gustavo", pontos: 5, concluida: true },
+        { id: 4, nome: "Fazer feira e organizar geladeira", responsavel: "Socorro", pontos: 15, concluida: false }
+      ],
+      multas: [
+        { id: 1, morador: "Socorro", motivo: "Louça acumulada na pia", valor: 10, data: "2026-10-18" }
+      ]
+    };
 
-    let contas = [
-      { id: 1, nome: "Aluguel / Condomínio", valor: 2100, categoria: "Moradia" },
-      { id: 2, nome: "Luz, Água & Gás", valor: 420, categoria: "Essencial" },
-      { id: 3, nome: "Internet & TV", valor: 160, categoria: "Serviços" },
-      { id: 4, nome: "Supermercado & Feira", valor: 1400, categoria: "Alimentação" }
-    ];
+    // Função para sincronizar dados no Firebase
+    window.salvarNoFirebase = async function() {
+      try {
+        await setDoc(docRef, window.state);
+      } catch (e) {
+        console.error("Erro ao salvar no Firebase:", e);
+      }
+    };
 
-    let tarefas = [
-      { id: 1, nome: "Lavar a louça e organizar pia", responsavel: "Guh", pontos: 10, concluida: true },
-      { id: 2, nome: "Limpeza pesada dos banheiros", responsavel: "Familiar 2", pontos: 20, concluida: true },
-      { id: 3, nome: "Retirar lixo e organizar reciclagem", responsavel: "Guh", pontos: 5, concluida: true },
-      { id: 4, nome: "Fazer feira e organizar geladeira", responsavel: "Familiar 3", pontos: 15, concluida: false }
-    ];
-
-    let multas = [
-      { id: 1, morador: "Familiar 3", motivo: "Louça acumulada na pia", valor: 10, data: "2026-10-18" }
-    ];
+    // Escuta em tempo real: atualiza a tela quando qualquer morador alterar algo
+    onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        window.state = docSnap.data();
+        window.calcularTudo();
+      } else {
+        window.salvarNoFirebase();
+      }
+    });
 
     // Alternar Abas
-    function switchTab(tab) {
+    window.switchTab = function(tab) {
       ['dashboard', 'tarefas', 'regras'].forEach(t => {
         document.getElementById(`sec-${t}`).classList.add('hidden');
         document.getElementById(`tab-${t}`).className = "px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-400 hover:text-white transition-all";
@@ -274,26 +309,26 @@
 
       document.getElementById(`sec-${tab}`).classList.remove('hidden');
       document.getElementById(`tab-${tab}`).className = "px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/30";
-    }
+    };
 
-    // Renderizar Painel de Destaque / Bonificação
-    function renderBannerDestaque() {
+    // Renderizar Banner do Morador Destaque
+    window.renderBannerDestaque = function() {
       const banner = document.getElementById('banner-destaque');
+      const { moradores } = window.state;
       
-      if (moradores.length === 0) {
+      if (!moradores || moradores.length === 0) {
         banner.innerHTML = `<p class="text-slate-400 text-sm">Nenhum morador cadastrado.</p>`;
         return;
       }
 
-      const totalArrecadado = moradores.reduce((acc, m) => acc + m.colaboracao, 0);
+      const totalArrecadado = moradores.reduce((acc, m) => acc + (m.colaboracao || 0), 0);
 
-      // Calcular pontuação ponderada (70% pela contribuição financeira + 30% pelos pontos de tarefas)
       let maiorDestaque = null;
       let maiorScore = -1;
 
       moradores.forEach(m => {
         const percFinanceiro = totalArrecadado > 0 ? (m.colaboracao / totalArrecadado) : 0;
-        const score = (percFinanceiro * 70) + (m.pontos * 1.5);
+        const score = (percFinanceiro * 70) + ((m.pontos || 0) * 1.5);
         if (score > maiorScore) {
           maiorScore = score;
           maiorDestaque = m;
@@ -319,7 +354,7 @@
               </div>
               <h2 class="text-2xl font-black text-white mt-0.5">${maiorDestaque.nome}</h2>
               <p class="text-xs text-slate-300 mt-1">
-                Contribuiu com <strong class="text-emerald-400">R$ ${maiorDestaque.colaboracao.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong> (${porc}% do total) + <strong class="text-amber-400">${maiorDestaque.pontos} pts em tarefas</strong>
+                Contribuiu com <strong class="text-emerald-400">R$ ${maiorDestaque.colaboracao.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong> (${porc}% do total) + <strong class="text-amber-400">${maiorDestaque.pontos || 0} pts em tarefas</strong>
               </p>
             </div>
           </div>
@@ -333,14 +368,15 @@
       } else {
         banner.innerHTML = `<p class="text-slate-400 text-xs">Insira os valores das colaborações para calcular o morador destaque do mês.</p>`;
       }
-    }
+    };
 
-    // Renderizar Moradores (Colaboradores)
-    function renderMoradores() {
+    // Renderizar Moradores
+    window.renderMoradores = function() {
       const container = document.getElementById('lista-moradores');
       container.innerHTML = '';
+      const { moradores } = window.state;
 
-      const totalArrecadado = moradores.reduce((acc, m) => acc + m.colaboracao, 0);
+      const totalArrecadado = moradores.reduce((acc, m) => acc + (m.colaboracao || 0), 0);
 
       moradores.forEach(m => {
         const porc = totalArrecadado > 0 ? ((m.colaboracao / totalArrecadado) * 100).toFixed(1) : 0;
@@ -353,8 +389,8 @@
                   ${m.nome.substring(0, 2).toUpperCase()}
                 </div>
                 <div>
-                  <input type="text" value="${m.nome}" onchange="atualizarMorador(${m.id}, 'nome', this.value)" class="bg-transparent text-white font-bold text-sm outline-none border-b border-transparent focus:border-indigo-500 w-36"/>
-                  <span class="text-[11px] text-slate-400 block">${m.pontos} pontos acumulados</span>
+                  <input type="text" value="${m.nome}" onchange="window.atualizarMorador(${m.id}, 'nome', this.value)" class="bg-transparent text-white font-bold text-sm outline-none border-b border-transparent focus:border-indigo-500 w-36"/>
+                  <span class="text-[11px] text-slate-400 block">${m.pontos || 0} pontos acumulados</span>
                 </div>
               </div>
 
@@ -363,16 +399,15 @@
                   <label class="text-[10px] text-slate-400 font-semibold uppercase block">Valor Colaborado</label>
                   <div class="flex items-center gap-1 text-sm font-extrabold text-emerald-400">
                     <span>R$</span>
-                    <input type="number" value="${m.colaboracao}" onchange="atualizarMorador(${m.id}, 'colaboracao', parseFloat(this.value) || 0)" class="bg-transparent text-emerald-400 font-extrabold w-28 text-right outline-none border-b border-transparent focus:border-emerald-500"/>
+                    <input type="number" value="${m.colaboracao}" onchange="window.atualizarMorador(${m.id}, 'colaboracao', parseFloat(this.value) || 0)" class="bg-transparent text-emerald-400 font-extrabold w-28 text-right outline-none border-b border-transparent focus:border-emerald-500"/>
                   </div>
                 </div>
-                <button onclick="removerMorador(${m.id})" class="text-slate-500 hover:text-rose-400 p-2 text-xs transition-all">
+                <button onclick="window.removerMorador(${m.id})" class="text-slate-500 hover:text-rose-400 p-2 text-xs transition-all">
                   <i class="fa-solid fa-trash-can"></i>
                 </button>
               </div>
             </div>
 
-            <!-- Barra de Porcentagem de Contribuição -->
             <div class="space-y-1">
               <div class="flex justify-between text-[11px] font-medium text-slate-400">
                 <span>Participação no Fundo da Casa</span>
@@ -385,75 +420,40 @@
           </div>
         `;
       });
-    }
-
-    function atualizarMorador(id, campo, valor) {
-      const m = moradores.find(x => x.id === id);
-      if (m) {
-        m[campo] = valor;
-        calcularTudo();
-      }
-    }
-
-    function adicionarMorador() {
-      const novoId = moradores.length ? Math.max(...moradores.map(m => m.id)) + 1 : 1;
-      moradores.push({ id: novoId, nome: `Morador ${novoId}`, colaboracao: 1000, pontos: 0 });
-      calcularTudo();
-    }
-
-    function removerMorador(id) {
-      moradores = moradores.filter(m => m.id !== id);
-      calcularTudo();
-    }
+    };
 
     // Renderizar Contas
-    function renderContas() {
+    window.renderContas = function() {
       const container = document.getElementById('lista-contas');
       container.innerHTML = '';
+      const { contas } = window.state;
 
       contas.forEach(c => {
         container.innerHTML += `
           <div class="flex items-center justify-between bg-slate-900/80 p-3 rounded-xl border border-slate-800">
             <div>
-              <input type="text" value="${c.nome}" onchange="atualizarConta(${c.id}, 'nome', this.value)" class="bg-transparent text-white text-xs font-semibold outline-none border-b border-transparent focus:border-rose-500 w-36"/>
+              <input type="text" value="${c.nome}" onchange="window.atualizarConta(${c.id}, 'nome', this.value)" class="bg-transparent text-white text-xs font-semibold outline-none border-b border-transparent focus:border-rose-500 w-36"/>
               <span class="text-[10px] uppercase font-bold text-slate-500 block mt-0.5">${c.categoria}</span>
             </div>
             <div class="flex items-center gap-2">
               <span class="text-xs text-slate-400">R$</span>
-              <input type="number" value="${c.valor}" onchange="atualizarConta(${c.id}, 'valor', parseFloat(this.value) || 0)" class="bg-transparent text-rose-400 font-bold text-xs w-20 text-right outline-none border-b border-transparent focus:border-rose-500"/>
-              <button onclick="removerConta(${c.id})" class="text-slate-500 hover:text-rose-400 p-1 text-xs">
+              <input type="number" value="${c.valor}" onchange="window.atualizarConta(${c.id}, 'valor', parseFloat(this.value) || 0)" class="bg-transparent text-rose-400 font-bold text-xs w-20 text-right outline-none border-b border-transparent focus:border-rose-500"/>
+              <button onclick="window.removerConta(${c.id})" class="text-slate-500 hover:text-rose-400 p-1 text-xs">
                 <i class="fa-solid fa-xmark"></i>
               </button>
             </div>
           </div>
         `;
       });
-    }
+    };
 
-    function atualizarConta(id, campo, valor) {
-      const c = contas.find(x => x.id === id);
-      if (c) {
-        c[campo] = valor;
-        calcularTudo();
-      }
-    }
+    // Recalcular Dashboard
+    window.calcularTudo = function() {
+      const { moradores, contas, multas } = window.state;
 
-    function adicionarConta() {
-      const novoId = contas.length ? Math.max(...contas.map(c => c.id)) + 1 : 1;
-      contas.push({ id: novoId, nome: "Nova Despesa", valor: 150, categoria: "Geral" });
-      calcularTudo();
-    }
-
-    function removerConta(id) {
-      contas = contas.filter(c => c.id !== id);
-      calcularTudo();
-    }
-
-    // Recalcular Valores Financeiros e Atualizar Dashboard
-    function calcularTudo() {
-      const totalColaborado = moradores.reduce((acc, m) => acc + m.colaboracao, 0);
-      const totalDespesas = contas.reduce((acc, c) => acc + c.valor, 0);
-      const totalCaixinha = multas.reduce((acc, x) => acc + x.valor, 0);
+      const totalColaborado = moradores.reduce((acc, m) => acc + (m.colaboracao || 0), 0);
+      const totalDespesas = contas.reduce((acc, c) => acc + (c.valor || 0), 0);
+      const totalCaixinha = multas.reduce((acc, x) => acc + (x.valor || 0), 0);
       const saldo = totalColaborado - totalDespesas;
 
       document.getElementById('kpi-colaborado').innerText = `R$ ${totalColaborado.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
@@ -466,7 +466,7 @@
       if (saldo >= 0) {
         elSaldo.innerText = `R$ ${saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
         elSaldo.className = "text-2xl font-bold text-indigo-400 mt-2";
-        elSaldoLabel.innerText = "Sobra / Reserva";
+        elSaldoLabel.innerText = "Saldo / Sobra";
         elSaldoSub.innerText = "Sobra positiva do mês";
       } else {
         elSaldo.innerText = `R$ ${Math.abs(saldo).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
@@ -477,22 +477,22 @@
 
       document.getElementById('kpi-caixinha').innerText = `R$ ${totalCaixinha.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
 
-      renderMoradores();
-      renderContas();
-      renderBannerDestaque();
-      renderTarefas();
-      renderMultas();
-    }
+      window.renderMoradores();
+      window.renderContas();
+      window.renderBannerDestaque();
+      window.renderTarefas();
+      window.renderMultas();
+    };
 
-    // Renderizar Tarefas & Ranking
-    function renderTarefas() {
+    // Renderizar Tarefas
+    window.renderTarefas = function() {
       const container = document.getElementById('lista-tarefas');
       const containerRanking = document.getElementById('placar-ranking');
       container.innerHTML = '';
       containerRanking.innerHTML = '';
+      const { moradores, tarefas } = window.state;
 
-      // Ordenar moradores por pontos de tarefas
-      const ranking = [...moradores].sort((a, b) => b.pontos - a.pontos);
+      const ranking = [...moradores].sort((a, b) => (b.pontos || 0) - (a.pontos || 0));
       ranking.forEach((m, idx) => {
         containerRanking.innerHTML += `
           <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/80 border border-slate-800">
@@ -502,13 +502,12 @@
             </div>
             <div class="flex items-center gap-1 text-amber-400 font-bold text-xs bg-amber-500/10 px-2 py-1 rounded-lg border border-amber-500/20">
               <i class="fa-solid fa-star text-[10px]"></i>
-              <span>${m.pontos} pts</span>
+              <span>${m.pontos || 0} pts</span>
             </div>
           </div>
         `;
       });
 
-      // Renderizar Cards de Tarefas
       tarefas.forEach(t => {
         container.innerHTML += `
           <div class="p-4 rounded-xl border ${t.concluida ? 'bg-slate-900/40 border-slate-800/60 opacity-60' : 'bg-slate-900/90 border-slate-800'} space-y-3">
@@ -520,45 +519,22 @@
             </div>
             <div class="flex justify-between items-center text-xs text-slate-400 pt-2 border-t border-slate-800/80">
               <span>Resp: <strong class="text-slate-200">${t.responsavel}</strong></span>
-              <button onclick="toggleTarefa(${t.id})" class="px-3 py-1 rounded-lg text-xs font-semibold ${t.concluida ? 'bg-emerald-500/20 text-emerald-400' : 'bg-indigo-600 hover:bg-indigo-500 text-white'} transition-all">
+              <button onclick="window.toggleTarefa(${t.id})" class="px-3 py-1 rounded-lg text-xs font-semibold ${t.concluida ? 'bg-emerald-500/20 text-emerald-400' : 'bg-indigo-600 hover:bg-indigo-500 text-white'} transition-all">
                 ${t.concluida ? '<i class="fa-solid fa-check mr-1"></i> Feito' : 'Marcar Feita'}
               </button>
             </div>
           </div>
         `;
       });
-    }
+    };
 
-    function toggleTarefa(id) {
-      const t = tarefas.find(x => x.id === id);
-      if (t) {
-        t.concluida = !t.concluida;
-        const m = moradores.find(x => x.nome === t.responsavel);
-        if (m) {
-          if (t.concluida) m.pontos += t.pontos;
-          else m.pontos = Math.max(0, m.pontos - t.pontos);
-        }
-        calcularTudo();
-      }
-    }
-
-    function adicionarTarefa() {
-      const nome = prompt("Nome da tarefa:");
-      if (!nome) return;
-      const resp = prompt(`Responsável (${moradores.map(m=>m.nome).join(', ')}):`, moradores[0]?.nome || '');
-      const pts = parseInt(prompt("Pontos concedidos:", "10")) || 10;
-
-      const novoId = tarefas.length ? Math.max(...tarefas.map(t => t.id)) + 1 : 1;
-      tarefas.push({ id: novoId, nome, responsavel: resp, pontos: pts, concluida: false });
-      calcularTudo();
-    }
-
-    // Renderizar Multas / Ocorrências
-    function renderMultas() {
+    // Renderizar Multas
+    window.renderMultas = function() {
       const container = document.getElementById('historico-multas');
       container.innerHTML = '';
+      const { multas } = window.state;
 
-      if (multas.length === 0) {
+      if (!multas || multas.length === 0) {
         container.innerHTML = `<p class="text-xs text-slate-500 italic py-4 text-center">Nenhuma infração registrada no momento.</p>`;
         return;
       }
@@ -579,30 +555,71 @@
           </div>
         `;
       });
-    }
+    };
 
-    function aplicarMultaModal() {
-      const morador = prompt(`Morador Infrator (${moradores.map(m=>m.nome).join(', ')}):`, moradores[0]?.nome || '');
+    // Funções Globais de Manipulação de Dados
+    window.atualizarMorador = (id, campo, val) => {
+      const m = window.state.moradores.find(x => x.id === id);
+      if (m) { m[campo] = val; window.salvarNoFirebase(); }
+    };
+
+    window.adicionarMorador = () => {
+      const id = Date.now();
+      window.state.moradores.push({ id, nome: "Novo Morador", colaboracao: 1000, pontos: 0 });
+      window.salvarNoFirebase();
+    };
+
+    window.removerMorador = (id) => {
+      window.state.moradores = window.state.moradores.filter(x => x.id !== id);
+      window.salvarNoFirebase();
+    };
+
+    window.atualizarConta = (id, campo, val) => {
+      const c = window.state.contas.find(x => x.id === id);
+      if (c) { c[campo] = val; window.salvarNoFirebase(); }
+    };
+
+    window.adicionarConta = () => {
+      const id = Date.now();
+      window.state.contas.push({ id, nome: "Nova Despesa", valor: 150, categoria: "Geral" });
+      window.salvarNoFirebase();
+    };
+
+    window.removerConta = (id) => {
+      window.state.contas = window.state.contas.filter(x => x.id !== id);
+      window.salvarNoFirebase();
+    };
+
+    window.toggleTarefa = (id) => {
+      const t = window.state.tarefas.find(x => x.id === id);
+      if (t) {
+        t.concluida = !t.concluida;
+        const m = window.state.moradores.find(x => x.nome === t.responsavel);
+        if (m) {
+          m.pontos = (m.pontos || 0) + (t.concluida ? t.pontos : -t.pontos);
+          if (m.pontos < 0) m.pontos = 0;
+        }
+        window.salvarNoFirebase();
+      }
+    };
+
+    window.adicionarTarefa = () => {
+      const nome = prompt("Nome da tarefa:");
+      if (!nome) return;
+      const resp = prompt(`Responsável (${window.state.moradores.map(m=>m.nome).join(', ')}):`, window.state.moradores[0]?.nome || '');
+      const pts = parseInt(prompt("Pontos concedidos:", "10")) || 10;
+      window.state.tarefas.push({ id: Date.now(), nome, responsavel: resp, pontos: pts, concluida: false });
+      window.salvarNoFirebase();
+    };
+
+    window.aplicarMultaModal = () => {
+      const morador = prompt(`Morador Infrator (${window.state.moradores.map(m=>m.nome).join(', ')}):`, window.state.moradores[0]?.nome || '');
       if (!morador) return;
       const motivo = prompt("Motivo da infração:");
       if (!motivo) return;
       const valor = parseFloat(prompt("Valor da multa (R$):", "10")) || 10;
-
-      const novoId = multas.length ? Math.max(...multas.map(x => x.id)) + 1 : 1;
-      multas.push({
-        id: novoId,
-        morador,
-        motivo,
-        valor,
-        data: new Date().toISOString().split('T')[0]
-      });
-
-      calcularTudo();
-    }
-
-    // Inicialização ao Carregar Página
-    window.onload = function() {
-      calcularTudo();
+      window.state.multas.push({ id: Date.now(), morador, motivo, valor, data: new Date().toISOString().split('T')[0] });
+      window.salvarNoFirebase();
     };
   </script>
 </body>
